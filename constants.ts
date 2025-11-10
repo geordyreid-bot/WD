@@ -8,6 +8,24 @@ export const REACTIONS: { id: ReactionType; text: string; icon: any }[] = [
     { id: 'seen', text: 'You are seen', icon: 'eye' },
 ];
 
+export const COUNTRY_CODES = [
+    { code: '+1', name: 'USA/CAN' },
+    { code: '+7', name: 'Russia' },
+    { code: '+20', name: 'Egypt' },
+    { code: '+27', name: 'South Africa' },
+    { code: '+33', name: 'France' },
+    { code: '+34', name: 'Spain' },
+    { code: '+39', name: 'Italy' },
+    { code: '+44', name: 'UK' },
+    { code: '+49', name: 'Germany' },
+    { code: '+52', name: 'Mexico' },
+    { code: '+55', name: 'Brazil' },
+    { code: '+61', name: 'Australia' },
+    { code: '+81', name: 'Japan' },
+    { code: '+86', name: 'China' },
+    { code: '+91', name: 'India' },
+].sort((a, b) => a.name.localeCompare(b.name));
+
 export const OBSERVABLES: Observable[] = [
     // Physical
     { id: 'p1', text: 'Looks unusually tired or fatigued', category: 'Physical', keywords: ['sleepy', 'exhausted', 'drained', 'lethargic', 'low energy', 'weary'] },

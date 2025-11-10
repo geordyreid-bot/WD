@@ -44,6 +44,7 @@ interface DashboardProps {
     onDeleteContact: (contactId: string) => void;
     onToggleBlockContact: (contactId: string, isBlocked: boolean) => void;
     onAddContacts: (newContacts: Contact[]) => void;
+    onEditContact: (contact: Contact) => void;
     onAddWinkUpdate: (winkId: string, updateTexts: string[]) => void;
 }
 
@@ -85,7 +86,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
     isSubscribed, isSubscriptionLoading, onSubscribe, markItemAsRead,
     handleSendSecondOpinionRequests, handleSecondOpinionResponse,
     handleCommunityWinkReaction, addCommunityExperience, handleDeleteItem,
-    onDeleteContact, onToggleBlockContact, onAddContacts, onAddWinkUpdate
+    onDeleteContact, onToggleBlockContact, onAddContacts, onEditContact, onAddWinkUpdate
 }) => {
     const mainRef = useRef<HTMLElement>(null);
     const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
@@ -133,6 +134,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     onDeleteContact={onDeleteContact}
                     onToggleBlockContact={onToggleBlockContact}
                     onAddContacts={onAddContacts}
+                    onEditContact={onEditContact}
                     navigate={navigate}
                 />;
             case 'Create Wink':

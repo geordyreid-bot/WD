@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal } from './Modal';
 import { Icon } from './Icon';
 import { Contact, ContactMethod } from '../../types';
+import { COUNTRY_CODES } from '../../constants';
 
 interface SyncContactsModalProps {
     isOpen: boolean;
@@ -29,25 +30,6 @@ const MOCK_SOCIAL_CONTACTS: Record<Exclude<ContactMethod, 'Phone' | 'WinkDrops' 
 };
 
 const MANUAL_CONTACT_METHODS: ContactMethod[] = ['Phone', 'Email', 'Instagram', 'X', 'Snapchat', 'TikTok', 'WinkDrops'];
-
-const COUNTRY_CODES = [
-    { code: '+1', name: 'USA/CAN' },
-    { code: '+7', name: 'Russia' },
-    { code: '+20', name: 'Egypt' },
-    { code: '+27', name: 'South Africa' },
-    { code: '+33', name: 'France' },
-    { code: '+34', name: 'Spain' },
-    { code: '+39', name: 'Italy' },
-    { code: '+44', name: 'UK' },
-    { code: '+49', name: 'Germany' },
-    { code: '+52', name: 'Mexico' },
-    { code: '+55', name: 'Brazil' },
-    { code: '+61', name: 'Australia' },
-    { code: '+81', name: 'Japan' },
-    { code: '+86', name: 'China' },
-    { code: '+91', name: 'India' },
-].sort((a, b) => a.name.localeCompare(b.name));
-
 
 export const SyncContactsModal: React.FC<SyncContactsModalProps> = ({ isOpen, onClose, onAddContacts, onSyncDeviceContacts, isSyncingDevice }) => {
     const [manualName, setManualName] = useState('');

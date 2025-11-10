@@ -4,12 +4,14 @@ import { Icon } from '../ui/Icon';
 import { Modal } from '../ui/Modal';
 import { SyncContactsModal } from '../ui/SyncContactsModal';
 import { Tooltip } from '../ui/Tooltip';
+import { ContactEditModal } from '../ui/ContactEditModal';
 
 interface ContactsPageProps {
     contacts: Contact[];
     onDeleteContact: (contactId: string) => void;
     onToggleBlockContact: (contactId: string, isBlocked: boolean) => void;
     onAddContacts: (newContacts: Contact[]) => void;
+    onEditContact: (contact: Contact) => void;
     navigate: (page: Page) => void;
 }
 
@@ -17,16 +19,54 @@ const contactMethodIcons: Record<ContactMethod, React.ComponentProps<typeof Icon
     'WinkDrops': 'users', 'Phone': 'smartphone', 'Email': 'mail', 'Instagram': 'instagram', 'X': 'twitter', 'Snapchat': 'ghost', 'TikTok': 'tiktok'
 };
 
-export const ContactsPage: React.FC<ContactsPageProps> = ({ contacts, onDeleteContact, onToggleBlockContact, onAddContacts, navigate }) => {
+const avatarColors = [
+    'bg-red-200 text-red-800', 'bg-sky-200 text-sky-800', 'bg-emerald-200 text-emerald-800',
+    'bg-amber-200 text-amber-800', 'bg-indigo-200 text-indigo-800', 'bg-rose-200 text-rose-800',
+    'bg-fuchsia-200 text-fuchsia-800', 'bg-teal-200 text-teal-800'
+];
+
+const ContactAvatar: React.FC<{ contact: Contact }> = ({ contact }) => {
+    const initials = (contact.name || '?').split(' ').map(n => n[0]).slice(0, 2).join('').toUpperCase();
+    const colorIndex = (initials.charCodeAt(0) || 0) % avatarColors.length;
+    const colorClass = avatarColors[colorIndex];
+
+    return (
+        <div className="relative flex-shrink-0">
+            <div className={`w-12 h-12 rounded-full flex items-center justify-center font-bold text-lg ${colorClass}`}>
+                {initials}
+            </div>
+            <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-full shadow-md">
+                <Icon name={contactMethodIcons[contact.method]} className="w-4 h-4 text-brand-secondary-600" />
+            </div>
+        </div>
+    );
+};
+
+
+export const ContactsPage: React.FC<ContactsPageProps> = ({ contacts, onDeleteContact, onToggleBlockContact, onAddContacts, onEditContact, navigate }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [isSyncModalOpen, setIsSyncModalOpen] = useState(false);
     const [actionTarget, setActionTarget] = useState<{ contact: Contact; type: 'delete' | 'block' | 'unblock' } | null>(null);
+    const [editingContact, setEditingContact] = useState<Contact | null>(null);
     const [isSyncing, setIsSyncing] = useState(false);
 
     const filteredContacts = contacts.filter(contact =>
         contact.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contact.handle.toLowerCase().includes(searchTerm.toLowerCase())
     );
+
+    const groupedContacts = filteredContacts
+        .sort((a, b) => a.name.localeCompare(b.name))
+        .reduce((acc, contact) => {
+            const firstLetter = (contact.name[0] || '#').toUpperCase();
+            if (!acc[firstLetter]) {
+                acc[firstLetter] = [];
+            }
+            acc[firstLetter].push(contact);
+            return acc;
+        }, {} as Record<string, Contact[]>);
+    
+    const sortedGroups = Object.keys(groupedContacts).sort();
 
     const handleSyncDeviceContacts = async () => {
         if (!('contacts' in navigator && 'ContactsManager' in window)) {
@@ -153,46 +193,54 @@ export const ContactsPage: React.FC<ContactsPageProps> = ({ contacts, onDeleteCo
                     </div>
                 </div>
 
-                <div className="flex-1 overflow-y-auto px-6 sm:px-8 pb-6">
+                <div className="flex-1 overflow-y-auto px-6 sm:px-8 pb-6 themed-scrollbar">
                     {contacts.length > 0 ? (
-                        <div className="space-y-3">
-                            {filteredContacts.map(contact => (
-                                <div key={contact.id} className={`p-4 rounded-xl transition-colors ${contact.isBlocked ? 'bg-brand-secondary-100 opacity-70' : 'bg-brand-surface border border-brand-secondary-200'}`}>
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex items-center gap-3 min-w-0">
-                                            <div className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center bg-brand-secondary-100 text-brand-secondary-600">
-                                                <Icon name={contactMethodIcons[contact.method]} className="w-5 h-5"/>
-                                            </div>
-                                            <div className="flex-grow min-w-0">
-                                                <p className="font-semibold text-brand-text-primary truncate">{contact.name}</p>
-                                                <p className="text-sm text-brand-text-secondary truncate">{contact.handle}</p>
-                                            </div>
-                                        </div>
-                                        <div className="flex items-center gap-1 flex-shrink-0">
-                                            <Tooltip content="More options">
-                                                <div className="relative group">
-                                                    <button className="p-2 rounded-full hover:bg-brand-secondary-200 text-brand-secondary-500">
-                                                        <Icon name="settings" className="w-4 h-4" />
-                                                    </button>
-                                                    <div className="absolute top-full right-0 mt-1 bg-white border border-brand-secondary-200 rounded-lg shadow-xl w-40 z-10 hidden group-hover:block">
-                                                        <button onClick={() => setActionTarget({ contact, type: contact.isBlocked ? 'unblock' : 'block' })} className="w-full text-left px-3 py-2 text-sm text-brand-text-secondary hover:bg-brand-secondary-50 flex items-center gap-2">
-                                                            <Icon name="ban" className="w-4 h-4"/> {contact.isBlocked ? 'Unblock' : 'Block'}
-                                                        </button>
-                                                        <button onClick={() => setActionTarget({ contact, type: 'delete' })} className="w-full text-left px-3 py-2 text-sm text-rose-600 hover:bg-rose-50 flex items-center gap-2">
-                                                            <Icon name="trash" className="w-4 h-4"/> Delete
-                                                        </button>
+                        <div className="space-y-4">
+                            {sortedGroups.map(letter => (
+                                <div key={letter}>
+                                    <h2 className="text-lg font-bold text-brand-primary-600 bg-brand-primary-50 px-3 py-1 rounded-md sticky top-0">{letter}</h2>
+                                    <div className="mt-2 space-y-3">
+                                        {groupedContacts[letter].map(contact => (
+                                            <div key={contact.id} className={`p-4 rounded-xl transition-colors ${contact.isBlocked ? 'bg-brand-secondary-100 opacity-70' : 'bg-brand-surface border border-brand-secondary-200'}`}>
+                                                <div className="flex items-center justify-between">
+                                                    <div className="flex items-center gap-4 min-w-0">
+                                                        <ContactAvatar contact={contact} />
+                                                        <div className="flex-grow min-w-0">
+                                                            <p className="font-semibold text-brand-text-primary truncate">{contact.name}</p>
+                                                            <p className="text-sm text-brand-text-secondary truncate">{contact.handle}</p>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-1 flex-shrink-0">
+                                                        <Tooltip content="More options">
+                                                            <div className="relative group">
+                                                                <button className="p-2 rounded-full hover:bg-brand-secondary-200 text-brand-secondary-500">
+                                                                    <Icon name="settings" className="w-4 h-4" />
+                                                                </button>
+                                                                <div className="absolute top-full right-0 mt-1 bg-white border border-brand-secondary-200 rounded-lg shadow-xl w-40 z-10 hidden group-hover:block">
+                                                                    <button onClick={() => setEditingContact(contact)} className="w-full text-left px-3 py-2 text-sm text-brand-text-secondary hover:bg-brand-secondary-50 flex items-center gap-2">
+                                                                        <Icon name="pencil" className="w-4 h-4"/> Edit
+                                                                    </button>
+                                                                    <button onClick={() => setActionTarget({ contact, type: contact.isBlocked ? 'unblock' : 'block' })} className="w-full text-left px-3 py-2 text-sm text-brand-text-secondary hover:bg-brand-secondary-50 flex items-center gap-2">
+                                                                        <Icon name="ban" className="w-4 h-4"/> {contact.isBlocked ? 'Unblock' : 'Block'}
+                                                                    </button>
+                                                                    <button onClick={() => setActionTarget({ contact, type: 'delete' })} className="w-full text-left px-3 py-2 text-sm text-rose-600 hover:bg-rose-50 flex items-center gap-2">
+                                                                        <Icon name="trash" className="w-4 h-4"/> Delete
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </Tooltip>
                                                     </div>
                                                 </div>
-                                            </Tooltip>
-                                        </div>
-                                    </div>
-                                    <div className="mt-3 pt-3 border-t border-brand-secondary-200/50 flex gap-2">
-                                        <button onClick={() => navigate('Create Wink')} disabled={contact.isBlocked} className="flex-1 text-sm font-semibold flex items-center justify-center gap-2 py-2 px-3 bg-brand-primary-100 text-brand-primary-700 rounded-md hover:bg-brand-primary-200 disabled:opacity-50 disabled:cursor-not-allowed interactive-scale">
-                                            <Icon name="eye" className="w-4 h-4"/> Wink
-                                        </button>
-                                        <button onClick={() => navigate('Create Nudge')} disabled={contact.isBlocked} className="flex-1 text-sm font-semibold flex items-center justify-center gap-2 py-2 px-3 bg-brand-secondary-100 text-brand-secondary-700 rounded-md hover:bg-brand-secondary-200 disabled:opacity-50 disabled:cursor-not-allowed interactive-scale">
-                                            <Icon name="nudge" className="w-4 h-4"/> Nudge
-                                        </button>
+                                                <div className="mt-3 pt-3 border-t border-brand-secondary-200/50 flex gap-2">
+                                                    <button onClick={() => navigate('Create Wink')} disabled={contact.isBlocked} className="flex-1 text-sm font-semibold flex items-center justify-center gap-2 py-2 px-3 bg-brand-primary-100 text-brand-primary-700 rounded-md hover:bg-brand-primary-200 disabled:opacity-50 disabled:cursor-not-allowed interactive-scale">
+                                                        <Icon name="eye" className="w-4 h-4"/> Wink
+                                                    </button>
+                                                    <button onClick={() => navigate('Create Nudge')} disabled={contact.isBlocked} className="flex-1 text-sm font-semibold flex items-center justify-center gap-2 py-2 px-3 bg-brand-secondary-100 text-brand-secondary-700 rounded-md hover:bg-brand-secondary-200 disabled:opacity-50 disabled:cursor-not-allowed interactive-scale">
+                                                        <Icon name="nudge" className="w-4 h-4"/> Nudge
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        ))}
                                     </div>
                                 </div>
                             ))}
@@ -215,6 +263,17 @@ export const ContactsPage: React.FC<ContactsPageProps> = ({ contacts, onDeleteCo
                 onSyncDeviceContacts={handleSyncDeviceContacts}
                 isSyncingDevice={isSyncing}
             />
+            {editingContact && (
+                <ContactEditModal
+                    isOpen={!!editingContact}
+                    onClose={() => setEditingContact(null)}
+                    contact={editingContact}
+                    onSave={(updatedContact) => {
+                        onEditContact(updatedContact);
+                        setEditingContact(null);
+                    }}
+                />
+            )}
         </div>
     );
 };

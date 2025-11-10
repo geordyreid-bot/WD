@@ -218,6 +218,10 @@ export const App: React.FC = () => {
         });
     }, []);
 
+    const handleEditContact = useCallback((updatedContact: Contact) => {
+        setContacts(prev => prev.map(c => c.id === updatedContact.id ? updatedContact : c));
+    }, []);
+
     /**
      * A centralized helper to apply updates to a Wink, whether it's in the inbox or outbox.
      * @param winkId The ID of the Wink to update.
@@ -360,6 +364,7 @@ export const App: React.FC = () => {
             onDeleteContact={handleDeleteContact}
             onToggleBlockContact={handleToggleBlockContact}
             onAddContacts={handleAddContacts}
+            onEditContact={handleEditContact}
             onAddWinkUpdate={handleAddWinkUpdate}
         />
     );

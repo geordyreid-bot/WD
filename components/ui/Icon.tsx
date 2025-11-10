@@ -1,7 +1,8 @@
 
 
 import React from 'react';
-import { LucideProps, Inbox, Send, Users, Activity, LogOut, ArrowRight, UserPlus, Eye, Heart, Brain, Apple, Droplets, Check, Loader2, AlertTriangle, ChevronLeft, X, Twitter, Instagram, Smartphone, Ghost, Search, ClipboardCheck, ChevronDown, SendHorizontal, Quote, Home, Link, PlusCircle, Bell, BellOff, Share2, ChevronRight, ThumbsUp, ThumbsDown, ShieldCheck, Settings, Trash2, Ban, Sparkles, ChevronUp, Gift, Music4, HelpCircle, Feather, Contact, Mail } from 'lucide-react';
+// FIX: Import the 'Feather' icon to be used for 'nudge'.
+import { LucideProps, Inbox, Send, Users, Activity, LogOut, ArrowRight, UserPlus, Eye, Heart, Brain, Apple, Droplets, Check, Loader2, AlertTriangle, ChevronLeft, X, Twitter, Instagram, Smartphone, Ghost, Search, ClipboardCheck, ChevronDown, SendHorizontal, Quote, Home, Link, PlusCircle, Bell, BellOff, Share2, ChevronRight, ThumbsUp, ThumbsDown, ShieldCheck, Settings, Trash2, Ban, Sparkles, ChevronUp, Gift, Music4, HelpCircle, Contact, Mail, Pencil, Feather } from 'lucide-react';
 
 export const icons = {
   inbox: Inbox,
@@ -51,6 +52,7 @@ export const icons = {
   helpCircle: HelpCircle,
   contact: Contact,
   mail: Mail,
+  pencil: Pencil,
 };
 
 type IconProps = LucideProps & {
