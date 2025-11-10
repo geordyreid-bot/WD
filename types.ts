@@ -2,7 +2,7 @@
 
 export type Category = 'Physical' | 'Mental' | 'Nutritional' | 'Hygiene' | 'Social' | 'Behavioral';
 
-export type Page = 'Dashboard' | 'Inbox' | 'Outbox' | 'Community' | 'Create Wink' | 'Create Nudge' | 'Self Check-in' | 'Contact Support' | 'Gift Marketplace' | 'Wink Updates' | 'Wink Social' | 'Privacy Policy';
+export type Page = 'Dashboard' | 'Inbox' | 'Outbox' | 'Community' | 'Create Wink' | 'Create Nudge' | 'Self Check-in' | 'Contact Support' | 'Gift Marketplace' | 'Wink Updates' | 'Wink Social' | 'Privacy Policy' | 'Contacts';
 
 export interface Observable {
     id: string;
@@ -66,7 +66,7 @@ export interface Wink {
 }
 
 export interface Nudge {
-    id: string;
+    id:string;
     type: 'Nudge';
     recipient: string;
     message: string;
@@ -87,7 +87,7 @@ export interface SecondOpinionRequest {
 
 export type InboxItem = Wink | Nudge | SecondOpinionRequest;
 
-export type ContactMethod = 'WinkDrops' | 'Phone' | 'Instagram' | 'X' | 'Snapchat' | 'TikTok';
+export type ContactMethod = 'WinkDrops' | 'Phone' | 'Email' | 'Instagram' | 'X' | 'Snapchat' | 'TikTok';
 
 export interface Contact {
     id: string;

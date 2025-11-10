@@ -16,6 +16,7 @@ import { WinkUpdates } from '../WinkUpdates';
 import { AppTutorial } from '../AppTutorial';
 import { WinkSocial } from './WinkSocial';
 import { PrivacyPage } from './PrivacyPage';
+import { ContactsPage } from './ContactsPage';
 
 interface DashboardProps {
     currentPage: Page;
@@ -126,6 +127,14 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     onReact={handleCommunityWinkReaction}
                     onAddExperience={addCommunityExperience}
                 />;
+            case 'Contacts':
+                return <ContactsPage
+                    contacts={contacts}
+                    onDeleteContact={onDeleteContact}
+                    onToggleBlockContact={onToggleBlockContact}
+                    onAddContacts={onAddContacts}
+                    navigate={navigate}
+                />;
             case 'Create Wink':
                 return <WinkComposer 
                     onWinkSent={addWinkToOutbox} 
@@ -173,7 +182,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
         }
     };
     
-    const isComposerPage = ['Create Wink', 'Create Nudge', 'Self Check-in', 'Contact Support', 'Gift Marketplace', 'Wink Updates', 'Wink Social'].includes(currentPage);
+    const isComposerPage = ['Create Wink', 'Create Nudge', 'Self Check-in', 'Contact Support', 'Gift Marketplace', 'Wink Updates', 'Wink Social', 'Contacts'].includes(currentPage);
 
     return (
         <div className="min-h-screen flex flex-col md:flex-row bg-brand-bg overflow-x-hidden">
@@ -187,6 +196,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <NavItem icon="inbox" label="Inbox" isActive={currentPage === 'Inbox'} onClick={() => navigate('Inbox')} />
                         <NavItem icon="send" label="Outbox" isActive={currentPage === 'Outbox'} onClick={() => navigate('Outbox')} />
                         <NavItem icon="users" label="Community" isActive={currentPage === 'Community'} onClick={() => navigate('Community')} />
+                        <NavItem icon="contact" label="Contacts" isActive={currentPage === 'Contacts'} onClick={() => navigate('Contacts')} />
                     </nav>
                      <div className="mt-10 border-t border-brand-secondary-200 pt-6 space-y-3">
                          <button onClick={() => navigate('Create Wink')} className="w-full bg-gradient-to-br from-brand-primary-400 to-brand-accent-400 text-white font-semibold px-4 py-3 rounded-xl shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2 interactive-scale">
@@ -250,7 +260,7 @@ export const Dashboard: React.FC<DashboardProps> = ({
                     <Icon name="plusCircle" className="w-8 h-8"/>
                 </button>
                 <MobileNavItem icon="users" label="Community" isActive={currentPage === 'Community'} onClick={() => navigate('Community')} />
-                <MobileNavItem icon="send" label="Outbox" isActive={currentPage === 'Outbox'} onClick={() => navigate('Outbox')} />
+                <MobileNavItem icon="contact" label="Contacts" isActive={currentPage === 'Contacts'} onClick={() => navigate('Contacts')} />
             </div>
 
             <NotificationSettingsModal 

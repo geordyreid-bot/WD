@@ -15,7 +15,7 @@ interface NudgeComposerProps {
 }
 
 const contactMethodIcons: Record<ContactMethod, React.ComponentProps<typeof Icon>['name']> = {
-    'WinkDrops': 'users', 'Phone': 'smartphone', 'Instagram': 'instagram', 'X': 'twitter', 'Snapchat': 'ghost', 'TikTok': 'tiktok'
+    'WinkDrops': 'users', 'Phone': 'smartphone', 'Email': 'mail', 'Instagram': 'instagram', 'X': 'twitter', 'Snapchat': 'ghost', 'TikTok': 'tiktok'
 };
 
 const PREDEFINED_NUDGES = [
@@ -39,7 +39,7 @@ const PREDEFINED_NUDGES = [
     'Take all the time you need. We can wait.',
 ];
 
-const sources: ('All' | ContactMethod)[] = ['All', 'WinkDrops', 'Phone', 'Instagram', 'X', 'Snapchat', 'TikTok'];
+const sources: ('All' | ContactMethod)[] = ['All', 'WinkDrops', 'Phone', 'Email', 'Instagram', 'X', 'Snapchat', 'TikTok'];
 
 export const NudgeComposer: React.FC<NudgeComposerProps> = ({ onNudgeSent, navigate, contacts, onDeleteContact, onToggleBlockContact, onAddContacts }) => {
     const [recipient, setRecipient] = useState('');
@@ -201,7 +201,7 @@ export const NudgeComposer: React.FC<NudgeComposerProps> = ({ onNudgeSent, navig
                             <h2 className="text-xl font-semibold text-brand-text-primary">1. Choose a Recipient</h2>
                              <button onClick={() => setIsSyncModalOpen(true)} className="flex items-center gap-2 text-sm font-semibold bg-brand-secondary-100 text-brand-secondary-800 px-3 py-1.5 rounded-lg hover:bg-brand-secondary-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed interactive-scale">
                                 <Icon name="userPlus" className="w-4 h-4"/>
-                                Sync Contacts
+                                Add / Sync Contacts
                             </button>
                         </div>
                         <p className="text-brand-text-secondary mb-4">Select a contact to send a positive message to. Your identity will remain anonymous.</p>

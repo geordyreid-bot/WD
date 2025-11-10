@@ -22,9 +22,9 @@ const categoryIcons: Record<Category, React.ComponentProps<typeof Icon>['name']>
     'Physical': 'heart', 'Mental': 'brain', 'Nutritional': 'apple', 'Hygiene': 'droplets', 'Social': 'users', 'Behavioral': 'activity'
 };
 const contactMethodIcons: Record<ContactMethod, React.ComponentProps<typeof Icon>['name']> = {
-    'WinkDrops': 'users', 'Phone': 'smartphone', 'Instagram': 'instagram', 'X': 'twitter', 'Snapchat': 'ghost', 'TikTok': 'tiktok'
+    'WinkDrops': 'users', 'Phone': 'smartphone', 'Email': 'mail', 'Instagram': 'instagram', 'X': 'twitter', 'Snapchat': 'ghost', 'TikTok': 'tiktok'
 };
-const sources: ('All' | ContactMethod)[] = ['All', 'WinkDrops', 'Phone', 'Instagram', 'X', 'Snapchat', 'TikTok'];
+const sources: ('All' | ContactMethod)[] = ['All', 'WinkDrops', 'Phone', 'Email', 'Instagram', 'X', 'Snapchat', 'TikTok'];
 
 const GroundedResourceDisplay: React.FC<{ title: string, content: GroundedContent }> = ({ title, content }) => (
     <div>
@@ -405,7 +405,7 @@ export const WinkComposer: React.FC<WinkComposerProps> = ({ onWinkSent, navigate
                                         <h2 className="text-xl font-semibold text-brand-text-primary">Who is this for?</h2>
                                         <button onClick={() => setIsSyncModalOpen(true)} className="flex items-center gap-2 text-sm font-semibold bg-brand-secondary-100 text-brand-secondary-800 px-3 py-1.5 rounded-lg hover:bg-brand-secondary-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed interactive-scale">
                                             <Icon name="userPlus" className="w-4 h-4"/>
-                                            Sync Contacts
+                                            Add / Sync Contacts
                                         </button>
                                     </div>
                                     <p className="text-brand-text-secondary mb-4">Select a contact or enter a name. Your identity will always remain anonymous.</p>
