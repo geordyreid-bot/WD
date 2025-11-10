@@ -2,7 +2,7 @@
 
 export type Category = 'Physical' | 'Mental' | 'Nutritional' | 'Hygiene' | 'Social' | 'Behavioral';
 
-export type Page = 'Dashboard' | 'Inbox' | 'Outbox' | 'Community' | 'Create Wink' | 'Create Nudge' | 'Self Check-in' | 'Contact Support' | 'Gift Marketplace' | 'Wink Updates' | 'Wink Social';
+export type Page = 'Dashboard' | 'Inbox' | 'Outbox' | 'Community' | 'Create Wink' | 'Create Nudge' | 'Self Check-in' | 'Contact Support' | 'Gift Marketplace' | 'Wink Updates' | 'Wink Social' | 'Privacy Policy';
 
 export interface Observable {
     id: string;

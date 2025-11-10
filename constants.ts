@@ -156,22 +156,12 @@ const AI_GENERATED_CONTENT_MOCK: any = {
     ]
 };
 
-export const MOCK_CONTACTS: Contact[] = [
-    { id: 'c1', name: 'Alex Johnson', method: 'WinkDrops', handle: 'alex_j', location: 'California, USA' },
-    { id: 'c2', name: 'Brenda Smith', method: 'Phone', handle: '+1-202-555-0181', location: 'London, UK' },
-    { id: 'c3', name: 'Casey Williams', method: 'Instagram', handle: '@casey_w', location: 'Tokyo, Japan', isBlocked: true },
-    { id: 'c4', name: 'David Miller', method: 'X', handle: '@dmiller', location: 'Sydney, Australia' },
-    { id: 'c5', name: 'Emily Brown', method: 'Snapchat', handle: 'emily.b', location: 'Paris, France' },
-    { id: 'c6', name: 'Frank Garcia', method: 'WinkDrops', handle: 'frank_g', location: 'Mexico City, Mexico' },
-    { id: 'c7', name: 'Grace Davis', method: 'Instagram', handle: '@grace_d', location: 'Toronto, Canada' },
-    { id: 'c8', name: 'Henry Rodriguez', method: 'Phone', handle: '+1-202-555-0129', location: 'Berlin, Germany' },
-    { id: 'c9', name: 'Isabella Wilson', method: 'X', handle: '@isabella_w', location: 'Seoul, South Korea' },
-    { id: 'c10', name: 'Jack Martinez', method: 'WinkDrops', handle: 'jack_m', location: 'São Paulo, Brazil' },
-    { id: 'c11', name: 'Karen Thompson', method: 'TikTok', handle: '@karent', location: 'Lagos, Nigeria' },
-];
+// MOCK_CONTACTS is now empty for a clean slate on deployment.
+export const MOCK_CONTACTS: Contact[] = [];
 
-const MOCK_OUTBOX_WINK: Wink = {
-    id: 'wink-out-1', type: 'Wink', recipient: 'David Miller',
+// This now serves as a template for generating community winks, not for the user's outbox.
+const MOCK_WINK_TEMPLATE: Wink = {
+    id: 'wink-template-1', type: 'Wink', recipient: 'a friend',
     observables: [
         findObservableById('m1'),
         findObservableById('s1'),
@@ -182,73 +172,27 @@ const MOCK_OUTBOX_WINK: Wink = {
     isRead: true,
 };
 
-const MOCK_NUDGE: Nudge = {
-    id: 'nudge-out-1',
-    type: 'Nudge',
-    recipient: 'Brenda Smith',
-    message: 'Thinking of you! Hope you have a great day.',
-    timestamp: new Date(Date.now() - 3600000 * 5),
-    isRead: true,
-};
+// MOCK_INBOX is now empty for a clean slate on deployment.
+export const MOCK_INBOX: InboxItem[] = [];
 
-export const MOCK_INBOX: InboxItem[] = [
-    {
-        id: 'wink-in-1',
-        type: 'Wink',
-        recipient: 'You',
-        observables: [
-            findObservableById('p1'),
-            findObservableById('m1'),
-        ],
-        aiContent: AI_GENERATED_CONTENT_MOCK,
-        timestamp: new Date(Date.now() - 3600000 * 2), // 2 hours ago
-        isRead: false,
-    },
-    {
-        id: 'sor-1',
-        type: 'SecondOpinionRequest',
-        winkId: 'wink-out-1',
-        originalRecipientName: 'David Miller',
-        winkObservables: MOCK_OUTBOX_WINK.observables,
-        timestamp: new Date(Date.now() - 3600000 * 8), // 8 hours ago
-        isRead: false,
-    },
-    {
-        id: 'nudge-in-1',
-        type: 'Nudge',
-        recipient: 'You',
-        message: 'Someone sent you a positive nudge!',
-        timestamp: new Date(Date.now() - 86400000), // Yesterday
-        isRead: true,
-    }
-];
-
-export const MOCK_OUTBOX: InboxItem[] = [
-    MOCK_OUTBOX_WINK,
-    { ...MOCK_NUDGE },
-    {
-        id: 'wink-out-2', type: 'Wink', recipient: 'Casey Williams',
-        observables: [ findObservableById('s3') ],
-        aiContent: AI_GENERATED_CONTENT_MOCK,
-        timestamp: new Date(Date.now() - 86400000 * 4), // 4 days ago
-        isRead: true,
-        secondOpinion: { agreements: 2, disagreements: 1, totalRequests: 4, respondedIds: [] }
-    }
-];
+// MOCK_OUTBOX is now empty for a clean slate on deployment.
+export const MOCK_OUTBOX: InboxItem[] = [];
 
 export const MOCK_COMMUNITY_EXPERIENCES: CommunityExperience[] = [
     { id: 'exp1', text: "Getting a Wink was a turning point. It made me realize I wasn't hiding my struggles as well as I thought, but also that someone cared enough to reach out. It gave me the courage to talk to a professional.", timestamp: new Date(Date.now() - 86400000 * 1) },
     { id: 'exp2', text: "I was so anxious about a friend, and WinkDrop let me break the ice without making things awkward. They actually brought it up to me later (not knowing it was me) and we had a real conversation. So grateful for this tool.", timestamp: new Date(Date.now() - 86400000 * 3) }
 ];
 
+const MOCK_COMMUNITY_LOCATIONS = [
+    'California, USA', 'London, UK', 'Tokyo, Japan', 'Sydney, Australia', 'Paris, France', 'Toronto, Canada', 'Berlin, Germany'
+];
 
 export const MOCK_COMMUNITY_WINKS: Wink[] = [
-    { ...MOCK_OUTBOX_WINK, id: 'cw-0', senderLocation: 'New York, USA', recipient: 'a friend', reactions: { support: 12, seen: 5, thinking: 8 } },
-    ...MOCK_CONTACTS.slice(0, 7).map((contact, index) => ({
-        ...MOCK_OUTBOX_WINK,
+    { ...MOCK_WINK_TEMPLATE, id: 'cw-0', senderLocation: 'New York, USA', reactions: { support: 12, seen: 5, thinking: 8 } },
+    ...MOCK_COMMUNITY_LOCATIONS.map((location, index) => ({
+        ...MOCK_WINK_TEMPLATE,
         id: `cw-${index + 1}`,
-        recipient: 'a friend',
-        senderLocation: contact.location,
+        senderLocation: location,
         observables: [
             OBSERVABLES[Math.floor(Math.random() * OBSERVABLES.length)],
             OBSERVABLES[Math.floor(Math.random() * OBSERVABLES.length)],

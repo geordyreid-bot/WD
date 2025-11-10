@@ -121,7 +121,9 @@ export const SelfCheckin: React.FC<SelfCheckinProps> = ({ navigate }) => {
                         isOutbox={false} 
                         onSendSecondOpinion={() => {}} 
                         contacts={[]}
-                        isSelfCheckinView={true} 
+                        isSelfCheckinView={true}
+// FIX: Pass the 'navigate' prop to WinkDetailView as it is required.
+                        navigate={navigate} 
                     />
                 </div>
             </div>

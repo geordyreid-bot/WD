@@ -15,6 +15,7 @@ import { GiftMarketplace } from '../GiftMarketplace';
 import { WinkUpdates } from '../WinkUpdates';
 import { AppTutorial } from '../AppTutorial';
 import { WinkSocial } from './WinkSocial';
+import { PrivacyPage } from './PrivacyPage';
 
 interface DashboardProps {
     currentPage: Page;
@@ -47,7 +48,7 @@ interface DashboardProps {
 
 const NavItem: React.FC<{
     icon: keyof typeof icons;
-    label: Page | 'Logout' | 'Home' | 'Settings' | 'Contact Support';
+    label: Page | 'Logout' | 'Home' | 'Settings' | 'Contact Support' | 'Privacy Policy';
     isActive: boolean;
     onClick: () => void;
 }> = ({ icon, label, isActive, onClick }) => (
@@ -156,6 +157,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                 />;
             case 'Wink Social':
                 return <WinkSocial navigate={navigate} />;
+            case 'Privacy Policy':
+                return <PrivacyPage navigate={navigate} />;
             case 'Dashboard':
             default:
                 return (
@@ -229,7 +232,8 @@ export const Dashboard: React.FC<DashboardProps> = ({
                         <NavItem icon="settings" label="Settings" isActive={false} onClick={() => setIsSettingsModalOpen(true)} />
                     )}
                     
-                    <NavItem icon="shieldCheck" label="Contact Support" isActive={currentPage === 'Contact Support'} onClick={() => navigate('Contact Support')} />
+                    <NavItem icon="helpCircle" label="Contact Support" isActive={currentPage === 'Contact Support'} onClick={() => navigate('Contact Support')} />
+                    <NavItem icon="shieldCheck" label="Privacy Policy" isActive={currentPage === 'Privacy Policy'} onClick={() => navigate('Privacy Policy')} />
                     <NavItem icon="logout" label="Logout" isActive={false} onClick={onLogout} />
                 </div>
             </aside>
