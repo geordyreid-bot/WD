@@ -41,7 +41,23 @@ export const App: React.FC = () => {
     const [outbox, setOutbox] = useState<InboxItem[]>(MOCK_OUTBOX);
     const [communityWinks, setCommunityWinks] = useState<Wink[]>(MOCK_COMMUNITY_WINKS);
     const [communityExperiences, setCommunityExperiences] = useState<CommunityExperience[]>(MOCK_COMMUNITY_EXPERIENCES);
-    const [contacts, setContacts] = useState<Contact[]>(MOCK_CONTACTS);
+    
+    // Note on "Best Practices": This app uses localStorage for simplicity and to maintain user privacy
+    // as outlined in the Privacy Policy (no data is sent to a server).
+    // For features like cross-device sync, a cloud database like Firestore would be the next step.
+    // The app is already configured with `enableFirebase: true` in metadata.json to facilitate this.
+    const [contacts, setContacts] = useState<Contact[]>(() => {
+        if (typeof window === 'undefined') {
+            return MOCK_CONTACTS;
+        }
+        try {
+            const savedContacts = window.localStorage.getItem('winkdrops_contacts');
+            return savedContacts ? JSON.parse(savedContacts) : MOCK_CONTACTS;
+        } catch (error) {
+            console.error('Error parsing contacts from localStorage', error);
+            return MOCK_CONTACTS;
+        }
+    });
     
     const [notificationPermission, setNotificationPermission] = useState<NotificationPermission>('default');
     const [isSubscribed, setIsSubscribed] = useState(false);
@@ -51,6 +67,12 @@ export const App: React.FC = () => {
         const savedSettings = window.localStorage.getItem('winkdrops_notification_settings');
         return savedSettings ? JSON.parse(savedSettings) : DEFAULT_NOTIFICATION_SETTINGS;
     });
+
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            window.localStorage.setItem('winkdrops_contacts', JSON.stringify(contacts));
+        }
+    }, [contacts]);
 
     const updateNotificationSettings = useCallback((newSettings: Partial<NotificationSettings>) => {
         setNotificationSettings(prev => {

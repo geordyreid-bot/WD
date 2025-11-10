@@ -30,11 +30,30 @@ const MOCK_SOCIAL_CONTACTS: Record<Exclude<ContactMethod, 'Phone' | 'WinkDrops' 
 
 const MANUAL_CONTACT_METHODS: ContactMethod[] = ['Phone', 'Email', 'Instagram', 'X', 'Snapchat', 'TikTok', 'WinkDrops'];
 
+const COUNTRY_CODES = [
+    { code: '+1', name: 'USA/CAN' },
+    { code: '+7', name: 'Russia' },
+    { code: '+20', name: 'Egypt' },
+    { code: '+27', name: 'South Africa' },
+    { code: '+33', name: 'France' },
+    { code: '+34', name: 'Spain' },
+    { code: '+39', name: 'Italy' },
+    { code: '+44', name: 'UK' },
+    { code: '+49', name: 'Germany' },
+    { code: '+52', name: 'Mexico' },
+    { code: '+55', name: 'Brazil' },
+    { code: '+61', name: 'Australia' },
+    { code: '+81', name: 'Japan' },
+    { code: '+86', name: 'China' },
+    { code: '+91', name: 'India' },
+].sort((a, b) => a.name.localeCompare(b.name));
+
 
 export const SyncContactsModal: React.FC<SyncContactsModalProps> = ({ isOpen, onClose, onAddContacts, onSyncDeviceContacts, isSyncingDevice }) => {
     const [manualName, setManualName] = useState('');
     const [manualMethod, setManualMethod] = useState<ContactMethod>('Phone');
     const [manualHandle, setManualHandle] = useState('');
+    const [manualCountryCode, setManualCountryCode] = useState('+1');
     
     const handleMockSync = (method: Exclude<ContactMethod, 'Phone' | 'WinkDrops' | 'Email'>) => {
         const newContacts: Contact[] = MOCK_SOCIAL_CONTACTS[method].map((contact, index) => ({
@@ -51,20 +70,30 @@ export const SyncContactsModal: React.FC<SyncContactsModalProps> = ({ isOpen, on
             alert('Please fill in all fields.');
             return;
         }
+        
+        const finalHandle = manualMethod === 'Phone'
+            ? `${manualCountryCode} ${manualHandle.trim()}`
+            : manualHandle.trim();
 
         const newContact: Contact = {
             id: `manual-${Date.now()}`,
             name: manualName.trim(),
             method: manualMethod,
-            handle: manualHandle.trim(),
+            handle: finalHandle,
         };
 
         onAddContacts([newContact]);
         setManualName('');
         setManualHandle('');
         setManualMethod('Phone');
+        setManualCountryCode('+1');
         alert(`Contact "${newContact.name}" added successfully!`);
         onClose();
+    };
+
+    const handleMethodChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setManualMethod(e.target.value as ContactMethod);
+        setManualHandle(''); // Clear handle when method changes for better UX
     };
 
     const syncOptions: {
@@ -80,6 +109,66 @@ export const SyncContactsModal: React.FC<SyncContactsModalProps> = ({ isOpen, on
         { label: 'Sync from Snapchat', icon: 'ghost', method: 'Snapchat', action: () => handleMockSync('Snapchat') },
         { label: 'Sync from TikTok', icon: 'tiktok', method: 'TikTok', action: () => handleMockSync('TikTok') },
     ];
+    
+    const getHandleInput = () => {
+        switch (manualMethod) {
+            case 'Phone':
+                return (
+                    <div className="grid grid-cols-3 gap-3">
+                        <div className="col-span-1">
+                            <label htmlFor="manual-country-code" className="block text-sm font-semibold text-brand-text-primary mb-1">Code</label>
+                            <select
+                                id="manual-country-code"
+                                value={manualCountryCode}
+                                onChange={(e) => setManualCountryCode(e.target.value)}
+                                className="w-full p-2 bg-white border border-brand-secondary-300 rounded-md focus:border-brand-primary-300 focus:ring-1 focus:ring-brand-primary-300 transition-colors"
+                            >
+                                {COUNTRY_CODES.map(c => <option key={c.code} value={c.code}>{c.code} ({c.name})</option>)}
+                            </select>
+                        </div>
+                        <div className="col-span-2">
+                            <label htmlFor="manual-handle-phone" className="block text-sm font-semibold text-brand-text-primary mb-1">Phone Number</label>
+                            <input
+                                id="manual-handle-phone"
+                                type="tel"
+                                value={manualHandle}
+                                onChange={(e) => setManualHandle(e.target.value)}
+                                placeholder="555 123 4567"
+                                className="w-full p-2 bg-white border border-brand-secondary-300 rounded-md focus:border-brand-primary-300 focus:ring-1 focus:ring-brand-primary-300 transition-colors"
+                            />
+                        </div>
+                    </div>
+                );
+            case 'Email':
+                return (
+                    <div>
+                        <label htmlFor="manual-handle-email" className="block text-sm font-semibold text-brand-text-primary mb-1">Email Address</label>
+                        <input
+                            id="manual-handle-email"
+                            type="email"
+                            value={manualHandle}
+                            onChange={(e) => setManualHandle(e.target.value)}
+                            placeholder="name@example.com"
+                            className="w-full p-2 bg-white border border-brand-secondary-300 rounded-md focus:border-brand-primary-300 focus:ring-1 focus:ring-brand-primary-300 transition-colors"
+                        />
+                    </div>
+                );
+            default:
+                 return (
+                    <div>
+                        <label htmlFor="manual-handle-text" className="block text-sm font-semibold text-brand-text-primary mb-1">Handle / Info</label>
+                        <input
+                            id="manual-handle-text"
+                            type="text"
+                            value={manualHandle}
+                            onChange={(e) => setManualHandle(e.target.value)}
+                            placeholder={manualMethod === 'WinkDrops' ? 'WinkDrops Username' : '@username'}
+                            className="w-full p-2 bg-white border border-brand-secondary-300 rounded-md focus:border-brand-primary-300 focus:ring-1 focus:ring-brand-primary-300 transition-colors"
+                        />
+                    </div>
+                );
+        }
+    };
 
 
     return (
@@ -87,7 +176,7 @@ export const SyncContactsModal: React.FC<SyncContactsModalProps> = ({ isOpen, on
             <div>
                  <div className="mt-2 pt-4 border-t border-brand-secondary-200">
                     <h4 className="font-semibold text-brand-text-primary text-center mb-4">Add Manually</h4>
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                         <div>
                             <label htmlFor="manual-name" className="block text-sm font-semibold text-brand-text-primary mb-1">Name</label>
                             <input
@@ -99,33 +188,23 @@ export const SyncContactsModal: React.FC<SyncContactsModalProps> = ({ isOpen, on
                                 className="w-full p-2 bg-white border border-brand-secondary-300 rounded-md focus:border-brand-primary-300 focus:ring-1 focus:ring-brand-primary-300 transition-colors"
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-3">
-                            <div>
-                                <label htmlFor="manual-method" className="block text-sm font-semibold text-brand-text-primary mb-1">Method</label>
-                                <select
-                                    id="manual-method"
-                                    value={manualMethod}
-                                    onChange={(e) => setManualMethod(e.target.value as ContactMethod)}
-                                    className="w-full p-2 bg-white border border-brand-secondary-300 rounded-md focus:border-brand-primary-300 focus:ring-1 focus:ring-brand-primary-300 transition-colors"
-                                >
-                                    {MANUAL_CONTACT_METHODS.map(m => <option key={m} value={m}>{m}</option>)}
-                                </select>
-                            </div>
-                             <div>
-                                <label htmlFor="manual-handle" className="block text-sm font-semibold text-brand-text-primary mb-1">Handle / Info</label>
-                                <input
-                                    id="manual-handle"
-                                    type="text"
-                                    value={manualHandle}
-                                    onChange={(e) => setManualHandle(e.target.value)}
-                                    placeholder="Number, email, or @username"
-                                    className="w-full p-2 bg-white border border-brand-secondary-300 rounded-md focus:border-brand-primary-300 focus:ring-1 focus:ring-brand-primary-300 transition-colors"
-                                />
-                            </div>
+                        <div>
+                            <label htmlFor="manual-method" className="block text-sm font-semibold text-brand-text-primary mb-1">Method</label>
+                            <select
+                                id="manual-method"
+                                value={manualMethod}
+                                onChange={handleMethodChange}
+                                className="w-full p-2 bg-white border border-brand-secondary-300 rounded-md focus:border-brand-primary-300 focus:ring-1 focus:ring-brand-primary-300 transition-colors"
+                            >
+                                {MANUAL_CONTACT_METHODS.map(m => <option key={m} value={m}>{m}</option>)}
+                            </select>
+                        </div>
+                        <div>
+                            {getHandleInput()}
                         </div>
                          <button
                             onClick={handleManualAdd}
-                            className="w-full mt-3 bg-brand-primary-500 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm hover:bg-brand-primary-600 transition-colors flex items-center justify-center gap-2 interactive-scale"
+                            className="w-full !mt-6 bg-brand-primary-500 text-white font-bold py-2.5 px-4 rounded-lg shadow-sm hover:bg-brand-primary-600 transition-colors flex items-center justify-center gap-2 interactive-scale"
                         >
                             <Icon name="userPlus" className="w-5 h-5" />
                             Save Contact

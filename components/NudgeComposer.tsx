@@ -91,17 +91,32 @@ export const NudgeComposer: React.FC<NudgeComposerProps> = ({ onNudgeSent, navig
         }
         setIsSyncing(true);
         try {
-            const props = ['name', 'tel'];
+            const props = ['name', 'tel', 'email'];
             const opts = { multiple: true };
             const deviceContacts = await (navigator.contacts as any).select(props, opts);
 
             if (deviceContacts.length > 0) {
-                const newContacts: Contact[] = deviceContacts.map((contact: any, index: number) => ({
-                    id: `sync-nudge-${Date.now()}-${index}`,
-                    name: contact.name?.[0] || 'Unnamed Contact',
-                    method: 'Phone' as ContactMethod,
-                    handle: contact.tel?.[0] || 'No phone number',
-                }));
+                const newContacts: Contact[] = deviceContacts.flatMap((contact: any) => {
+                    const created: Contact[] = [];
+                    if (contact.tel && contact.tel[0]) {
+                        created.push({
+                            id: `sync-nudge-tel-${Date.now()}-${created.length}`,
+                            name: contact.name?.[0] || 'Unnamed Contact',
+                            method: 'Phone' as ContactMethod,
+                            handle: contact.tel[0],
+                        });
+                    }
+                    if (contact.email && contact.email[0]) {
+                         created.push({
+                            id: `sync-nudge-email-${Date.now()}-${created.length}`,
+                            name: contact.name?.[0] || 'Unnamed Contact',
+                            method: 'Email' as ContactMethod,
+                            handle: contact.email[0],
+                        });
+                    }
+                    return created;
+                });
+
                 onAddContacts(newContacts);
                 alert(`${newContacts.length} contact(s) synced successfully!`);
             }
